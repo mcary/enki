@@ -1,6 +1,8 @@
 class Comment < ActiveRecord::Base
+  include Rakismet::Model
+  rakismet_attrs :content => :body
+  
   DEFAULT_LIMIT = 15
-  has_rakismet :only => :create, :content => :body
 
   attr_accessor         :openid_error
   attr_accessor         :openid_valid
