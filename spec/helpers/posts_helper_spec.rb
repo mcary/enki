@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe PostsHelper do
   include PostsHelper
+  include UrlHelper
 
   before(:all) do
     @post = Post.new(:title => 'A Post',
@@ -17,7 +18,8 @@ describe PostsHelper do
 
   describe '#truncate_body_html' do
     it 'should truncate post body html' do
-      truncate_body_html(@post).body_html.length.should == 56
+      strip_tags(truncate_body_html(@post).body_html).should ==
+        "Lorem ipsum. Read more..."
     end
 
     it 'should ensure that truncated post includes read more link' do
