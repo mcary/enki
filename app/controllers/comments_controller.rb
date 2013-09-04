@@ -4,8 +4,7 @@ class CommentsController < ApplicationController
 
   include UrlHelper
   
-  include Rakismet::Controller
-  rakismet_filter :only => [:create]
+#  rakismet_filter :only => [:create]
   
   OPEN_ID_ERRORS = { 
     :missing  => "Sorry, the OpenID server couldn't be found", 
@@ -68,7 +67,7 @@ class CommentsController < ApplicationController
     # #authenticate_with_open_id may have already provided a response
     unless response.headers[Rack::OpenID::AUTHENTICATE_HEADER]
       if @comment.save
-        if Enki::Config.default[:comment_start_as] == 'spam'
+        if enki_config[:comment_start_as] == 'spam'
           flash[:notice] = 'Your comment is awaiting for approval.'
         end
         redirect_to post_path(@post)

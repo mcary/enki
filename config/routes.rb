@@ -5,7 +5,10 @@ Enki::Application.routes.draw do
     resources :posts, :pages do
       post 'preview', :on => :collection
     end
-    resources :comments
+    resources :comments do
+      put 'mark_as_spam', :on => :member
+      put 'mark_as_ham', :on => :member
+    end
     resources :undo_items do
       post 'undo', :on => :member
     end

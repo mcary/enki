@@ -43,7 +43,7 @@ gem 'formtastic'
 gem 'will_paginate', '~> 3.0.2'
 gem 'exception_notification', '~> 2.5.2'
 gem 'open_id_authentication'
-gem 'rakismet', "~> 0.4.0"
+gem 'rakismet', "~> 1.0"
 
 # Bundle gems for the local environment. Make sure to
 # put test-only gems in this group so their generators

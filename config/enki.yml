@@ -16,7 +16,8 @@ open_id_delegation:
   server:   http://www.myopenid.com/server
   delegate: http://username.myopenid.com
 
-# Configure your Wordpress Rakismet key and url. Register at wordpress.com
+# Configure your Wordpress Rakismet key. Register at wordpress.com
 rakismet:
-  key:
-  url:
+  key: # key is required
+  #url: # defaults to blog URL
+  #host: # defaults to "rest.akismet.com", but others endpoints exist

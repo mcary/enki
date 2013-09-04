@@ -3,7 +3,7 @@
   <td class='author'><%= link_to(comment.author, admin_comment_path(comment)) %></td>
   <td><%= truncate(comment.body, :length => 50) %></td>
   <td><%= link_to(truncate(comment.post_title, :length => 40), admin_post_path(comment.post))%></td>
-  <td><%=h comment.user_ip %></td>
+  <td><%= comment.user_ip %></td>
   <td><%= link_to(comment.akismet, akismet_url(comment), :method => :put, :confirm => "Invert spam/ham?", :title => "Invert spam/ham?") %></td>
   <td>
     <%= link_to(image_tag('silk/pencil.png', :alt => 'edit'), admin_comment_path(comment)) %>
