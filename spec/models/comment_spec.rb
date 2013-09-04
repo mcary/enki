@@ -22,19 +22,19 @@ describe Comment do
   it "is invalid with no post" do
     set_comment_attributes(@comment, :post => nil)
     @comment.should_not be_valid
-    @comment.errors.on(:post).should_not be_blank
+    @comment.errors.should_not be_empty
   end
 
   it "is invalid with no body" do
     set_comment_attributes(@comment, :body => '')
     @comment.should_not be_valid
-    @comment.errors.on(:body).should_not be_blank
+    @comment.errors.should_not be_empty
   end
 
   it "is invalid with no author" do
     set_comment_attributes(@comment, :author => '')
     @comment.should_not be_valid
-    @comment.errors.on(:author).should_not be_blank
+    @comment.errors.should_not be_empty
   end
 
   it "is valid with a full set of valid attributes" do
@@ -42,31 +42,51 @@ describe Comment do
     @comment.should be_valid
   end
 
-  it "requires OpenID authentication when the author's name contains a period" do
+  it "requires OpenID authentication when the author's name looks like a url" do
     @comment.author = "Don Alias"
     @comment.requires_openid_authentication?.should == false
     @comment.author = "enkiblog.com"
     @comment.requires_openid_authentication?.should == true
   end
 
+  it "doesn't require auth just because the author's name contains a dot" do
+    @comment.author = "Dr. Alias"
+    @comment.requires_openid_authentication?.should == false
+  end
+
+  it "requires OpenID authentication when the author's name starts with http" do
+    @comment.author = "http://localhost:9294"
+    @comment.requires_openid_authentication?.should == true
+    @comment.author = "https://localhost:9294"
+    @comment.requires_openid_authentication?.should == true
+  end
+
   it "asks post to update it's comment counter after save" do
-    @comment.class.after_save.include?(:denormalize).should == true
-    @comment.post = mock_model(Post)
-    @comment.post.should_receive(:denormalize_comments_count!)
-    @comment.denormalize
+    set_comment_attributes(@comment)
+    @comment.blank_openid_fields
+    @comment.post.update_attributes(:title => 'My Post', :body => "body")
+    @comment.post.save
+    @comment.save
+    @comment.post.approved_comments.count.should == 1
   end
 
   it "asks post to update it's comment counter after destroy" do
-    @comment.class.after_destroy.include?(:denormalize).should == true
-    @comment.post = mock_model(Post)
-    @comment.post.should_receive(:denormalize_comments_count!)
-    @comment.denormalize
+    set_comment_attributes(@comment)
+    @comment.blank_openid_fields
+    @comment.post.update_attributes(:title => 'My Post', :body => "body")
+    @comment.post.save
+    @comment.save
+    @comment.destroy
+    @comment.post.approved_comments.count.should == 0
   end
 
   it "applies a Lesstile filter to body and store it in body_html before save" do
-    @comment.class.before_save.include?(:apply_filter).should == true
-    Lesstile.should_receive(:format_as_xhtml).and_return("formatted")
-    @comment.apply_filter
+    set_comment_attributes(@comment)
+    @comment.blank_openid_fields
+    @comment.post.update_attributes(:title => 'My Post', :body => "body")
+    @comment.post.save
+    @comment.save
+    @comment.body_html.should_not be_nil
   end
 
   it "responds to trusted_user? for defensio integration" do
@@ -165,5 +185,25 @@ describe Comment, '.build_for_preview with OpenID author' do
 
   it 'sets author to "Your OpenID Name"' do
     @comment.author.should == "Your OpenID Name"
+  end
+end
+
+describe Comment, '#requires_openid_authentication?' do
+  describe 'with an author that looks like a url' do
+    subject { Comment.new(:author => 'example.com').requires_openid_authentication? }
+
+      it { should be }
+  end
+
+  describe 'with a normal author' do
+    subject { Comment.new(:author => 'Don Alias').requires_openid_authentication? }
+
+    it { should_not be }
+  end
+
+  describe 'with a nil author' do
+    subject { Comment.new.requires_openid_authentication? }
+
+    it { should_not be }
   end
 end

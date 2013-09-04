@@ -1,8 +1,7 @@
 class Tag < ActiveRecord::Base
   has_many                :taggings, :dependent => :destroy
 
-  validates_presence_of   :name
-  validates_uniqueness_of :name
+  validates               :name, :presence => true, :uniqueness => true
 
   # TODO: Contribute this back to acts_as_taggable_on_steroids plugin
   # Update taggables' cached_tag_list
@@ -17,7 +16,7 @@ class Tag < ActiveRecord::Base
   end
 
   cattr_accessor :destroy_unused
-  self.destroy_unused = false
+  self.destroy_unused = true
 
   # LIKE is used for cross-database case-insensitivity
   def self.find_or_create_with_like_by_name(name)

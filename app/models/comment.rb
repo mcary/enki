@@ -14,11 +14,10 @@ class Comment < ActiveRecord::Base
   after_save            :denormalize
   after_destroy         :denormalize
 
-  validates_presence_of :author, :body, :post
+  validates             :author, :body, :post, :presence => true
+  validate :open_id_error_should_be_blank
 
-  # validate :open_id_thing
-  def validate
-    super
+  def open_id_error_should_be_blank
     errors.add(:base, openid_error) unless openid_error.blank?
   end
   
@@ -38,7 +37,9 @@ class Comment < ActiveRecord::Base
   end
 
   def requires_openid_authentication?
-    !!self.author.index(".")
+    return false unless author
+
+    !!(author =~ %r{^https?://} || author =~ /\w+\.\w+/)
   end
 
   def trusted_user?

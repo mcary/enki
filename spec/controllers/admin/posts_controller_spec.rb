@@ -101,7 +101,7 @@ describe Admin::PostsController do
 
     it 'is unprocessable' do
       do_put
-      response.status.should == '422 Unprocessable Entity'
+      response.status.should == 422
     end
   end
 
@@ -147,7 +147,7 @@ describe Admin::PostsController do
   describe 'handling DELETE to destroy, JSON request' do
     before(:each) do
       @post = Post.new(:title => 'A post')
-      @post.stub!(:destroy_with_undo).and_return(mock("undo_item", :description => 'hello'))
+      @post.stub!(:destroy_with_undo).and_return(mock_model(UndoItem, :description => 'hello'))
       Post.stub!(:find).and_return(@post)
     end
 
@@ -157,13 +157,13 @@ describe Admin::PostsController do
     end
 
     it("deletes post") do
-      @post.should_receive(:destroy_with_undo).and_return(mock("undo_item", :description => 'hello'))
+      @post.should_receive(:destroy_with_undo).and_return(mock_model(UndoItem, :description => 'hello'))
       do_delete
     end
 
-    it("renders post as json") do
+    it("renders json including a description of the post") do
       do_delete
-      response.should have_text(/#{Regexp.escape(@post.to_json)}/)
+      JSON.parse(response.body)['undo_message'].should == 'hello'
     end
   end
 end
@@ -171,7 +171,6 @@ end
 describe Admin::PostsController, 'with an AJAX request to preview' do
   before(:each) do
     Post.should_receive(:build_for_preview).and_return(@post = mock_model(Post))
-    controller.should_receive(:render).with(:partial => 'posts/post.html.erb', :locals => {:post => @post})
     session[:logged_in] = true
     xhr :post, :preview, :post => {
       :title        => 'My Post',

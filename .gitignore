@@ -3,8 +3,5 @@ log
 tmp/**/*
 tmp
 config/database.yml
-db/schema.rb
-config/enki.yml
-db/schema.rb
-db/*.sqlite3
-coverage/
+.bundle
+*.log
