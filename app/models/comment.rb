@@ -9,7 +9,6 @@ class Comment < ActiveRecord::Base
 
   belongs_to            :post
 
-  before_create         :default_status
   before_save           :apply_filter
   after_save            :denormalize
   after_destroy         :denormalize
@@ -21,10 +20,6 @@ class Comment < ActiveRecord::Base
     errors.add(:base, openid_error) unless openid_error.blank?
   end
   
-  def default_status
-    self.akismet = Enki::Config.default[:comment_start_as] || 'ham'
-  end
-
   def apply_filter
     self.body_html = Lesstile.format_as_xhtml(self.body, :code_formatter => Lesstile::CodeRayFormatter)
     self.author_email = "" unless self.author_email

@@ -90,11 +90,15 @@ describe Admin::CommentsController do
       session[:logged_in] = true
     end
     
-    it "should invert status" do
+    it "should mark as spam" do
+      Comment.any_instance.should_receive(:spam!)
       put :mark_as_spam, :id => @comment.to_param
       @comment.reload
       @comment.akismet.should == 'spam'
+    end
       
+    it "should mark as ham" do
+      Comment.any_instance.should_receive(:ham!)
       put :mark_as_ham, :id => @comment.to_param
       @comment.reload
       @comment.akismet.should == 'ham'

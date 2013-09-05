@@ -27,11 +27,13 @@ class Admin::CommentsController < Admin::BaseController
   end
   
   def mark_as_ham
+    @comment.ham!
     params[:comment] = { :akismet => 'ham' }
     update
   end
   
   def mark_as_spam
+    @comment.spam!
     params[:comment] = { :akismet => 'spam' }
     update
   end

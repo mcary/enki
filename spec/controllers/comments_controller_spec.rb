@@ -65,6 +65,8 @@ describe CommentsController, 'handling commenting' do
     before(:each) do
       mock_post!
 
+      Comment.any_instance.stub(:spam? => true)
+
       post :create, :year => '2007', :month => '01', :day => '01', :slug => 'a-post', :comment => {
         :author => 'Don Alias',
         :body   => 'This is a comment',
@@ -100,6 +102,10 @@ describe CommentsController, 'handling commenting' do
 
     it "forbids setting of updated_at" do
       assigns(:comment).updated_at.should_not == @updated_at
+    end
+
+    it "sets akismet status" do
+      assigns(:comment).akismet.should == 'spam'
     end
   end
 end
