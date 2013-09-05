@@ -16,6 +16,15 @@ class Comment < ActiveRecord::Base
   validates             :author, :body, :post, :presence => true
   validate :open_id_error_should_be_blank
 
+  def spam?
+    result = nil
+    ms = Benchmark.ms do
+      result = super
+    end
+    logger.info "Akismet response in #{ms.round} ms: #{akismet_response}"
+    result
+  end
+
   def open_id_error_should_be_blank
     errors.add(:base, openid_error) unless openid_error.blank?
   end
