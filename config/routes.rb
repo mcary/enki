@@ -22,7 +22,10 @@ Enki::Application.routes.draw do
     get ':year/:month/:day/:slug/comments'  => 'comments#index'
     post ':year/:month/:day/:slug/comments' => 'comments#create'
     get ':year/:month/:day/:slug/comments/new' => 'comments#new'
-    get ':year/:month/:day/:slug' => 'posts#show'
+    get ':year/:month/:day/:slug' => 'posts#show',
+      # Explicitly disallow .rss and .atom to avoid raising errors
+      # when those templates are not found
+      :constraints => { :format => :html }
   end
 
   scope :to => 'posts#index' do
